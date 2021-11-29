@@ -1,4 +1,6 @@
-# Introducción a WebSocket: construcción de un chat paso a paso
+# Introducción a WebSocket
+
+## Construcción de un CHAT paso a paso
 
 **Pablo Almunia**
 - 
