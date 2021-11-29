@@ -1,7 +1,7 @@
 /*
- * 06 example
+ * 09 example
  *
- * Simple chat
+ * Rooms
  */
 import {WebSocketServer} from 'ws';
 
