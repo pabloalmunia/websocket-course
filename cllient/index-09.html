@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    07 example
+
+    Elegant Simple chat
+  -->
+  <meta charset="UTF-8">
+  <title>WebSocket Course</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+  <style>
+
+    #result {
+      border-left      : 0.3rem solid #9b4dca;
+      background-color : #f4f5f6;
+      height           : 50rem;
+      overflow         : auto;
+      padding          : 1em;
+    }
+
+    #result .you .head {
+      font-size  : 0.8em;
+      text-align : right;
+    }
+
+    #result .you .message {
+      color            : white;
+      width            : 60%;
+      border-radius    : 5px 0 10px 10px;
+      border           : 1px solid #9b4dca;;
+      padding          : 1em;
+      background-color : #9b4dca;;
+      margin-left      : auto;
+    }
+
+    #result .other .head {
+      font-size  : 0.8em;
+      text-align : left;
+    }
+
+    #result .other .message {
+      color         : black;
+      width         : 60%;
+      border-radius : 0 5px 10px 10px;
+      border        : 1px solid #9b4dca;;
+      padding       : 1em;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <h1>WebSocket Course - 9</h1>
+  </div>
+  <div class="row">
+    <div class="column">
+      <label for="room">Room:</label>
+      <select id="room">
+        <option>Room A</option>
+        <option>Room B</option>
+        <option>Room C</option>
+        <option>Room D</option>
+      </select>
+      <label for="name">Your name:</label>
+      <input type="text" placeholder="write your name here" id="name"/>
+      <label for="text">Comment</label>
+      <textarea placeholder="write your message here" id="text"></textarea>
+      <button class="button-primary" id="send" disabled>Send</button>
+      <label for="result">Receive:</label>
+      <div id="result"></div>
+    </div>
+  </div>
+</div>
+<script>
+  const id         = Math.random().toString(32).substring(2);
+  let ws;
+  const room       = document.querySelector('#room');
+  const name       = document.querySelector('#name');
+  const text       = document.querySelector('#text');
+  const send       = document.querySelector('#send');
+  const result     = document.querySelector('#result');
+  const dateFormat = new Intl.DateTimeFormat(window.navigator.language, {dateStyle: 'short', timeStyle: 'short'});
+
+  function connect () {
+    console.log('connect');
+    ws           = new WebSocket('ws://localhost:9001');
+    ws.onopen    = () => {
+      send.disabled = false;
+      ws.send(
+        JSON.stringify({
+          type: 'init',
+          room: room.value,
+          id
+        })
+      );
+    };
+    ws.onclose   = () => {
+      result.innerHTML = '';
+      send.disabled    = true;
+      setTimeout(connect, 500);
+    };
+    ws.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      if (data.type === 'load') {
+        data.conversation.forEach(addData);
+        return;
+      }
+      addData(data);
+    };
+  }
+
+  connect();
+
+  function addData (data) {
+    const div = document.createElement('div');
+    div.classList.add(data.id === id ? 'you' : 'other')
+    div.innerHTML = `
+        <div class="head">
+          ${data.id === id ? 'you' : data.name}
+          (at ${dateFormat.format(new Date(data.date))})</div>
+        <div class="message">${data.text}</div>`
+    result.appendChild(div);
+    result.scrollTo(0, result.scrollHeight);
+  }
+
+  room.addEventListener('change', () => {
+    result.innerHTML = '';
+    ws.send(
+      JSON.stringify({
+        type: 'init',
+        room: room.value,
+        id
+      })
+    );
+  });
+
+  send.addEventListener('click', () => {
+    const msg = JSON.stringify({
+      room: room.value,
+      id  : id,
+      name: name.value,
+      text: text.value
+    });
+    ws.send(msg);
+    text.value = '';
+  });
+</script>
+</body>
+</html>

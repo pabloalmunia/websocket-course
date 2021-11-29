@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    04 example
+
+    Receive data
+  -->
+  <meta charset="UTF-8">
+  <title>WebSocket Course</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <h1>WebSocket Course - 4</h1>
+  </div>
+  <div class="row">
+    <div class="column">
+      <label for="result">Receive:</label>
+      <pre><code id="result" class="monospace"></code></pre>
+    </div>
+  </div>
+</div>
+<script>
+  const result = document.querySelector('#result');
+  const ws     = new WebSocket('ws://localhost:9001');
+  ws.onmessage = (msg) => {
+    result.innerHTML += `${msg.data}\n`;
+  };
+</script>
+</body>
+</html>

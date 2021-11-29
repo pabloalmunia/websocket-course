@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    05 example
+
+    Echo
+  -->
+  <meta charset="UTF-8">
+  <title>WebSocket Course</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+  <style>
+    #result {
+      height   : 50rem;
+      overflow : auto;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <h1>WebSocket Course - 5</h1>
+  </div>
+  <div class="row">
+    <div class="column">
+      <label for="text">Comment</label>
+      <textarea placeholder="Write your message here" id="text"></textarea>
+      <button class="button-primary" id="send" disabled>Send</button>
+      <label for="result">Receive:</label>
+      <pre><code id="result" ></code></pre>
+    </div>
+  </div>
+</div>
+<script>
+  let ws;
+  const text   = document.querySelector('#text');
+  const send   = document.querySelector('#send');
+  const result = document.querySelector('#result');
+
+  function connect () {
+    ws           = new WebSocket('ws://localhost:9001');
+    ws.onopen    = () => {
+      send.disabled = false;
+    };
+    ws.onclose   = () => {
+      send.disabled    = true;
+      setTimeout(connect, 500);
+    };
+    ws.onmessage = (msg) => {
+      result.innerHTML += `${ msg.data }\n`;
+      result.scrollTo(0, result.scrollHeight);
+    };
+  }
+
+  connect();
+
+  send.addEventListener('click', () => {
+    ws.send(text.value);
+    text.value = '';
+  });
+</script>
+</body>
+</html>
